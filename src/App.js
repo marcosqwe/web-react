@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { isEmpty, size } from 'lodash'
-import shortid from 'shortid'
-import { addDocument, getCollection } from './action'
+import { addDocument, getCollection, updateDocument } from './action'
 
 function App() {
     const [task, setTask] = useState("")
@@ -49,11 +48,18 @@ function App() {
       setTasks([...tasks, { id: result.data.id, name:task }])
       setTask("")
     }
-     const saveTask = (e) => {
+    
+     const saveTask = async(e) => {
       e.preventDefault()
        
        if (!validForm()){
         return 
+      }
+
+      const result = await updateDocument("tasks",id,{name:task})
+      if (!result.statusResponse){
+        setError(result.error)
+        return
       }
 
       const editedTasks = tasks.map(item => item.id == id ? { id, name: task} : item)
